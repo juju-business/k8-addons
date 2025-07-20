@@ -1,0 +1,8 @@
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: production-l2-advertisement # A name for your L2 advertisement
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - production-ip-pool # Refers to the name of your IPAddressPool

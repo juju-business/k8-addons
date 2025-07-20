@@ -1,0 +1,8 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: production-ip-pool # A name for your IP pool
+  namespace: metallb-system
+spec:
+  addresses:
+    - 192.168.2.230-192.168.2.235 # <--- REPLACE WITH YOUR ACTUAL UNUSED IP RANGE

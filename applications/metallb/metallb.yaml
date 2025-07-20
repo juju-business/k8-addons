@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metallb
+  namespace: argocd # Argo CD will manage this Application resource within its own namespace
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://metallb.github.io/metallb # Official MetalLB Helm Chart Repo
+    targetRevision: "0.14.3" # IMPORTANT: Pin a specific stable version
+    chart: metallb
+    helm:
+      values: |
+        # Only required if you need a specific version of the controller/speaker image
+        # controller:
+        #   image:
+        #     tag: v0.14.3
+        # speaker:
+        #   image:
+        #     tag: v0.14.3
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: metallb-system # MetalLB's recommended namespace
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

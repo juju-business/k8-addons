@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metallb-config
+  namespace: argocd # Argo CD manages this Application resource in its namespace
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/your-org/kubernetes-addons.git # Points to YOUR Git repo
+    targetRevision: HEAD # Or a specific branch/tag like 'main'
+    path: applications/metallb/config-manifests # Path within this repo for the config files
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: metallb-system # Config should be in the same namespace as MetalLB
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false # MetalLB chart already created this namespace
+      - ServerSideApply=true # Recommended for CRDs to avoid conflicts
+      - ApplyOutOfSyncOnly=true # Only apply when out of sync
+      # The following ensures config is applied *after* MetalLB CRDs are available
+      - RespectIgnoreDifferences=true # Recommended
+    dependsOn:
+      - metallb # This is a custom dependency, ensure 'metallb' Application is healthy first
