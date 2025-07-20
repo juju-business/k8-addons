@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ingress-nginx
+  namespace: argocd # Argo CD will manage this Application resource within its own namespace
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io # Recommended for clean deletion
+spec:
+  project: default
+  source:
+    repoURL: https://kubernetes.github.io/ingress-nginx # Official Nginx Ingress Helm Chart Repo
+    targetRevision: controller-1.10.1 # IMPORTANT: Pin a specific version, check latest stable
+    chart: ingress-nginx
+    # Optional: Add custom values for the Helm chart if needed
+    # helm:
+    #   values: |
+    #     controller:
+    #       service:
+    #         type: LoadBalancer # Requires MetalLB if on-prem, otherwise NodePort or HostPort
+    #       admissionWebhooks:
+    #         enabled: false # Often causes issues during initial setup if cert-manager isn't ready
+  destination:
+    server: https://kubernetes.default.svc # Points to the cluster's API server
+    namespace: ingress-nginx # The namespace where Nginx Ingress will be deployed
+  syncPolicy:
+    automated:
+      prune: true # Allow Argo CD to delete resources that are no longer in Git
+      selfHeal: true # Allow Argo CD to correct deviations from Git state
+    syncOptions:
+      - CreateNamespace=true # Argo CD will create the 'ingress-nginx' namespace if it doesn't exist
