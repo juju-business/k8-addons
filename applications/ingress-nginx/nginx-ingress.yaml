@@ -11,7 +11,7 @@ spec:
   project: default
   source:
     repoURL: https://kubernetes.github.io/ingress-nginx # Official Nginx Ingress Helm Chart Repo
-    targetRevision: controller-1.10.1 # IMPORTANT: Pin a specific version, check latest stable
+    targetRevision: 4.8.3 # IMPORTANT: Pin a specific version, check latest stable
     chart: ingress-nginx
     # Optional: Add custom values for the Helm chart if needed
     # helm:

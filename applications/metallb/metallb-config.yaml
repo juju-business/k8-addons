@@ -10,7 +10,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/your-org/kubernetes-addons.git # Points to YOUR Git repo
+    repoURL: https://github.com/juju-business/k8-addons.git # Points to YOUR Git repo
     targetRevision: HEAD # Or a specific branch/tag like 'main'
     path: applications/metallb/config-manifests # Path within this repo for the config files
   destination:
