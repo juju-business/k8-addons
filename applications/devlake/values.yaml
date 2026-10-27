@@ -1,0 +1,42 @@
+# Helm values for the DevLake release (chart devlake-1.0.2, app v1.0.2), namespace: devlake
+#
+# Install/upgrade (secret is supplied at install time, never committed):
+#   helm repo add devlake https://apache.github.io/incubator-devlake-helm-chart
+#   helm upgrade --install devlake devlake/devlake -n devlake --create-namespace --version 1.0.2 \
+#     -f values.yaml \
+#     --set lake.encryptionSecret.secret="$DEVLAKE_ENCRYPTION_SECRET"
+#
+# The encryption secret encrypts stored connection tokens. Losing it makes saved
+# connections undecryptable, so keep it in Infisical (or another secret store).
+# Chart default MySQL passwords (rootPassword/password) are also left at defaults here.
+#
+# Storage is on the nfs-client class, whose export squashes root. Pods therefore
+# run as the NAS user (uid 1024 / gid 100), matching other NFS-backed apps.
+#
+# Note: mysql.storage.class lives in a StatefulSet volumeClaimTemplate and cannot be
+# changed in place; changing it requires deleting the StatefulSet and its PVC.
+# If the mysql pod crashloops after a template change, delete the pod so the
+# StatefulSet rolls it (a not-ready pod blocks the rolling update).
+
+grafana:
+  useExternal: false
+  persistence:
+    storageClassName: nfs-client
+  initChownData:
+    enabled: false
+  securityContext:
+    runAsUser: 1024
+    runAsGroup: 100
+    fsGroup: 100
+    runAsNonRoot: true
+
+mysql:
+  storage:
+    class: nfs-client
+  securityContext:
+    fsGroup: 100
+    fsGroupChangePolicy: Always
+  containerSecurityContext:
+    runAsUser: 1024
+    runAsGroup: 100
+    runAsNonRoot: true
